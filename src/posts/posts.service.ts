@@ -9,10 +9,19 @@ const API_URL = 'https://jsonplaceholder.typicode.com/posts/';
 export class PostsService {
   constructor(private readonly httpService: HttpService) {}
 
-  async getPosts(): Promise<GetAllPostsResponse> {
+  async getPosts(search?: string): Promise<GetAllPostsResponse> {
     const { data } = await firstValueFrom(
       this.httpService.get<Post[]>(API_URL),
     );
-    return data;
+
+    if (!search) {
+      return data;
+    }
+
+    const searchLowerCase = search.toLowerCase();
+
+    return data
+      .filter((post) => post.title.toLowerCase().includes(searchLowerCase))
+      .sort((a, b) => b.title.length - a.title.length);
   }
 }
